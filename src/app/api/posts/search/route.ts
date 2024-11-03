@@ -4,26 +4,23 @@ import path from 'path';
 
 const db = new sqlite3.Database(path.join(process.cwd(), 'data', 'database.sqlite'));
 
-export async function GET(request: Request) {
+export async function GET(request: Request): Promise<Response> {
     try {
         const { searchParams } = new URL(request.url);
         const query = searchParams.get('q');
-        
-        console.log('Search query:', query);
 
         if (!query) {
-            return NextResponse.json({ 
-                error: 'Search query is required' 
-            }, { 
-                status: 400 
-            });
+            return NextResponse.json(
+                { error: 'Search query is required' },
+                { status: 400 }
+            );
         }
 
-        return new Promise((resolve) => {
+        return new Promise<Response>((resolve) => {
             const searchQuery = `%${query}%`;
             
-            const sql = `
-                SELECT DISTINCT
+            db.all(
+                `SELECT 
                     p.id,
                     p.title,
                     p.content,
@@ -36,24 +33,12 @@ export async function GET(request: Request) {
                 WHERE LOWER(p.title) LIKE LOWER(?)
                    OR LOWER(p.content) LIKE LOWER(?)
                    OR LOWER(u.name) LIKE LOWER(?)
-                ORDER BY 
-                    CASE 
-                        WHEN LOWER(u.name) LIKE LOWER(?) THEN 1
-                        WHEN LOWER(p.title) LIKE LOWER(?) THEN 2
-                        ELSE 3
-                    END,
-                    p.created_at DESC
-                LIMIT 15
-            `;
-
-            console.log('Executing search query with term:', searchQuery);
-
-            db.all(
-                sql, 
-                [searchQuery, searchQuery, searchQuery, searchQuery, searchQuery], 
+                ORDER BY p.created_at DESC
+                LIMIT 15`,
+                [searchQuery, searchQuery, searchQuery],
                 (err, posts) => {
                     if (err) {
-                        console.error('Database error:', err);
+                        console.error('Search error:', err);
                         resolve(NextResponse.json(
                             { error: 'Failed to search posts' },
                             { status: 500 }
@@ -61,7 +46,6 @@ export async function GET(request: Request) {
                         return;
                     }
 
-                    console.log('Found posts:', posts);
                     resolve(NextResponse.json(posts || []));
                 }
             );
