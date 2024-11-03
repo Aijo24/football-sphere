@@ -1,9 +1,10 @@
 "use client"
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface SearchResult {
     id: number;
@@ -20,7 +21,7 @@ export default function Header() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     if (!searchTerm.trim()) return;
 
     setIsSearching(true);
@@ -43,7 +44,7 @@ export default function Header() {
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [searchTerm]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -55,7 +56,7 @@ export default function Header() {
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
+  }, [searchTerm, handleSearch]);
 
   const handleLogout = async () => {
     try {
@@ -138,10 +139,15 @@ export default function Header() {
                   >
                     <div style={resultContentStyle}>
                       {result.image && (
-                        <img 
+                        <Image 
                           src={result.image} 
                           alt={result.title}
-                          style={resultImageStyle}
+                          width={40}
+                          height={40}
+                          style={{
+                            objectFit: 'cover',
+                            borderRadius: '4px'
+                          }}
                         />
                       )}
                       <div>

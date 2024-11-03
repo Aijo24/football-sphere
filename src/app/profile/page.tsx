@@ -106,7 +106,7 @@ export default function ProfilePage() {
 
                 {posts.length === 0 ? (
                     <div className={styles.noPosts}>
-                        <p>You haven't created any posts yet.</p>
+                        <p>You haven&apos;t created any posts yet.</p>
                         <Link href="/create-post">
                             <motion.button 
                                 className={styles.createButton}

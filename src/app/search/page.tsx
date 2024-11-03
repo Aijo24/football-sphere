@@ -51,7 +51,7 @@ export default function SearchPage() {
                 </div>
             ) : (
                 <div className={styles.noResults}>
-                    No results found for "{query}"
+                    No results found for &quot;{query}&quot;
                 </div>
             )}
         </div>
