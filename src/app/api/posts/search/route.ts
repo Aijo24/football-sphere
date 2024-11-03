@@ -4,16 +4,15 @@ import path from 'path';
 
 const db = new sqlite3.Database(path.join(process.cwd(), 'data', 'database.sqlite'));
 
-export async function GET(request: Request): Promise<Response> {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const query = searchParams.get('q');
 
         if (!query) {
-            return NextResponse.json(
-                { error: 'Search query is required' },
-                { status: 400 }
-            );
+            return NextResponse.json([], { status: 200 });
         }
 
         return new Promise<Response>((resolve) => {
