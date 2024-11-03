@@ -5,6 +5,15 @@ import path from 'path';
 
 const db = new sqlite3.Database(path.join(process.cwd(), 'data', 'database.sqlite'));
 
+interface User {
+    id: number;
+    email: string;
+    password: string;
+    name: string;
+    role: string;
+    created_at?: string;
+}
+
 export async function POST(request: Request): Promise<Response> {
     try {
         const { email, password } = await request.json();
@@ -17,7 +26,7 @@ export async function POST(request: Request): Promise<Response> {
         }
 
         return new Promise<Response>((resolve) => {
-            db.get(
+            db.get<User>(
                 'SELECT * FROM users WHERE email = ?',
                 [email],
                 async (err, user) => {
@@ -30,7 +39,7 @@ export async function POST(request: Request): Promise<Response> {
                         return;
                     }
 
-                    if (!user) {
+                    if (!user || !user.password) {
                         resolve(NextResponse.json(
                             { error: 'User not found' },
                             { status: 404 }
@@ -38,22 +47,53 @@ export async function POST(request: Request): Promise<Response> {
                         return;
                     }
 
-                    const isValid = await bcrypt.compare(password, user.password);
-                    if (!isValid) {
-                        resolve(NextResponse.json(
-                            { error: 'Invalid password' },
-                            { status: 401 }
-                        ));
-                        return;
-                    }
+                    try {
+                        const isValid = await bcrypt.compare(password, user.password);
+                        if (!isValid) {
+                            resolve(NextResponse.json(
+                                { error: 'Invalid password' },
+                                { status: 401 }
+                            ));
+                            return;
+                        }
 
-                    const { password: _, ...userWithoutPassword } = user;
-                    resolve(NextResponse.json(userWithoutPassword));
+                        // Type-safe way to omit password
+                        const { password: _, ...userWithoutPassword } = user;
+                        
+                        resolve(NextResponse.json({
+                            user: userWithoutPassword,
+                            message: 'Login successful'
+                        }));
+                    } catch (bcryptError) {
+                        console.error('Password comparison error:', bcryptError);
+                        resolve(NextResponse.json(
+                            { error: 'Authentication failed' },
+                            { status: 500 }
+                        ));
+                    }
                 }
             );
         });
     } catch (error) {
         console.error('Login error:', error);
+        return NextResponse.json(
+            { error: 'Internal server error' },
+            { status: 500 }
+        );
+    }
+}
+
+// Optional: Add a route to check if user is logged in
+export async function GET(request: Request): Promise<Response> {
+    try {
+        // Here you would typically check the session/token
+        // For now, we'll just return an unauthorized status
+        return NextResponse.json(
+            { error: 'Not authenticated' },
+            { status: 401 }
+        );
+    } catch (error) {
+        console.error('Auth check error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

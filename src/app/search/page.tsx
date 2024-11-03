@@ -4,15 +4,29 @@ import { useSearchParams } from 'next/navigation'
 import PostCard from '@/components/PostCard'
 import styles from './search.module.css'
 
+interface SearchResult {
+    id: number;
+    title: string;
+    content: string;
+    image: string;
+    author: string;
+    created_at: string;
+    author_id: number;
+}
+
 export default function SearchPage() {
     const searchParams = useSearchParams();
     const query = searchParams.get('q');
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState<SearchResult[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchResults = async () => {
-            if (!query) return;
+            if (!query) {
+                setResults([]);
+                setLoading(false);
+                return;
+            }
 
             setLoading(true);
             try {
@@ -20,9 +34,13 @@ export default function SearchPage() {
                 if (response.ok) {
                     const data = await response.json();
                     setResults(data);
+                } else {
+                    console.error('Search failed:', response.statusText);
+                    setResults([]);
                 }
             } catch (error) {
                 console.error('Search error:', error);
+                setResults([]);
             } finally {
                 setLoading(false);
             }
@@ -31,21 +49,41 @@ export default function SearchPage() {
         fetchResults();
     }, [query]);
 
+    if (!query) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.noQuery}>
+                    Please enter a search term
+                </div>
+            </div>
+        );
+    }
+
     if (loading) {
-        return <div className={styles.loading}>Searching...</div>;
+        return (
+            <div className={styles.container}>
+                <div className={styles.loading}>Searching...</div>
+            </div>
+        );
     }
 
     return (
         <div className={styles.container}>
-            <h1>Search Results for "{query}"</h1>
+            <div className={styles.searchHeader}>
+                <h1>Search Results</h1>
+                <p className={styles.searchInfo}>
+                    Found {results.length} result{results.length !== 1 ? 's' : ''} for &quot;{query}&quot;
+                </p>
+            </div>
+
             {results.length > 0 ? (
                 <div className={styles.resultsGrid}>
-                    {results.map((post) => (
+                    {results.map((post: SearchResult) => (
                         <PostCard 
                             key={post.id}
-                            title={post.title}
-                            image={post.image}
-                            author={post.author}
+                            title={post.title || 'Untitled'}
+                            image={post.image || '/default-image.jpg'}
+                            author={post.author || 'Unknown Author'}
                         />
                     ))}
                 </div>

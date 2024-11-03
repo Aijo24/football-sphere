@@ -24,21 +24,17 @@ export default function ProfilePage() {
 
     useEffect(() => {
         const fetchUserPosts = async () => {
-            if (!user) return;
+            if (!user?.id) return;
             
             try {
                 setLoading(true);
                 const response = await fetch(`/api/posts/user/${user.id}`);
-                
-                console.log('Response status:', response.status);
                 
                 if (!response.ok) {
                     throw new Error('Failed to fetch posts');
                 }
                 
                 const data = await response.json();
-                console.log('Fetched posts:', data);
-                
                 setPosts(data);
             } catch (err) {
                 console.error('Error fetching posts:', err);
@@ -81,8 +77,15 @@ export default function ProfilePage() {
             <div className={styles.profileHeader}>
                 <h1>My Profile</h1>
                 <div className={styles.userInfo}>
-                    <p className={styles.userName}>{user.name}</p>
-                    <p className={styles.userEmail}>{user.email}</p>
+                    <p className={styles.userName}>
+                        {user?.name || 'Unknown User'}
+                    </p>
+                    <p className={styles.userEmail}>
+                        {user?.email || 'No email provided'}
+                    </p>
+                    {user?.role && (
+                        <p className={styles.userRole}>Role: {user.role}</p>
+                    )}
                 </div>
             </div>
 
@@ -92,12 +95,8 @@ export default function ProfilePage() {
                     <Link href="/create-post">
                         <motion.button 
                             className={styles.createButton}
-                            whileHover={{ 
-                                scale: 1.05,
-                            }}
-                            whileTap={{ 
-                                scale: 0.95 
-                            }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                         >
                             Create New Post
                         </motion.button>

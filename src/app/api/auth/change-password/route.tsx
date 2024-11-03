@@ -5,6 +5,11 @@ import path from 'path';
 
 const db = new sqlite3.Database(path.join(process.cwd(), 'data', 'database.sqlite'));
 
+interface User {
+    id: number;
+    password: string;
+}
+
 export async function POST(request: Request): Promise<Response> {
     try {
         const { currentPassword, newPassword, userIdToChange } = await request.json();
@@ -50,11 +55,12 @@ export async function POST(request: Request): Promise<Response> {
                 );
             } else {
                 // Regular user flow
-                db.get(
-                    'SELECT password FROM users WHERE id = ?',
+                db.get<User>(
+                    'SELECT id, password FROM users WHERE id = ?',
                     [userIdToChange],
                     async (err, user) => {
                         if (err) {
+                            console.error('Database error:', err);
                             resolve(NextResponse.json(
                                 { error: 'Database error' },
                                 { status: 500 }
@@ -62,7 +68,7 @@ export async function POST(request: Request): Promise<Response> {
                             return;
                         }
 
-                        if (!user) {
+                        if (!user || !user.password) {
                             resolve(NextResponse.json(
                                 { error: 'User not found' },
                                 { status: 404 }
@@ -70,32 +76,41 @@ export async function POST(request: Request): Promise<Response> {
                             return;
                         }
 
-                        const isValid = await bcrypt.compare(currentPassword, user.password);
-                        if (!isValid) {
-                            resolve(NextResponse.json(
-                                { error: 'Current password is incorrect' },
-                                { status: 400 }
-                            ));
-                            return;
-                        }
-
-                        db.run(
-                            'UPDATE users SET password = ? WHERE id = ?',
-                            [hashedPassword, userIdToChange],
-                            (err) => {
-                                if (err) {
-                                    resolve(NextResponse.json(
-                                        { error: 'Failed to update password' },
-                                        { status: 500 }
-                                    ));
-                                    return;
-                                }
-
-                                resolve(NextResponse.json({ 
-                                    message: 'Password updated successfully' 
-                                }));
+                        try {
+                            const isValid = await bcrypt.compare(currentPassword, user.password);
+                            if (!isValid) {
+                                resolve(NextResponse.json(
+                                    { error: 'Current password is incorrect' },
+                                    { status: 400 }
+                                ));
+                                return;
                             }
-                        );
+
+                            db.run(
+                                'UPDATE users SET password = ? WHERE id = ?',
+                                [hashedPassword, userIdToChange],
+                                (updateErr) => {
+                                    if (updateErr) {
+                                        console.error('Update error:', updateErr);
+                                        resolve(NextResponse.json(
+                                            { error: 'Failed to update password' },
+                                            { status: 500 }
+                                        ));
+                                        return;
+                                    }
+
+                                    resolve(NextResponse.json({ 
+                                        message: 'Password updated successfully' 
+                                    }));
+                                }
+                            );
+                        } catch (bcryptError) {
+                            console.error('Bcrypt error:', bcryptError);
+                            resolve(NextResponse.json(
+                                { error: 'Password comparison failed' },
+                                { status: 500 }
+                            ));
+                        }
                     }
                 );
             }
