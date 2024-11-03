@@ -1,4 +1,4 @@
-export const books = [
+export const posts = [
     { id: 1,author:'William Shakespearee', title: 'Soul',image:'https://marketplace.canva.com/EAFaQMYuZbo/1/0/1003w/canva-brown-rusty-mystery-novel-book-cover-hG1QhA7BiBU.jpg' , description:'A book review is a form of literary criticism in which a book is merely described or analyzed. ',content:`<p>
     William Shakespeare's "Romeo and Juliet" is a timeless tale of love, fate, and tragedy that has captivated audiences for centuries. Set in Verona, Italy, the play tells the story of two young lovers from feuding families, whose passion ultimately leads to their untimely deaths. Through rich language, vivid characters, and poignant themes, Shakespeare explores the complexities of human emotion and the consequences of impulsive actions.
     </p>

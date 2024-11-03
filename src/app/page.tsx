@@ -1,48 +1,101 @@
 "use client"
-import BookCard from '@/components/BookCard'
+import { useEffect, useState } from 'react'
+import PostCard from '@/components/PostCard'
 import Header from '@/components/Header'
-import SideBar from '@/components/SideBar'
-import { books } from '@/constants/mockData'
 import { motion } from 'framer-motion'
 import styles from './page.module.css'
+import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext'
+
+interface Post {
+    id: number;
+    title: string;
+    content: string;
+    image: string;
+    author: string;
+    created_at: string;
+}
+
 export default function Home() {
-  return (
-    <main className={styles.main}>
-  <div>
+    const { user } = useAuth();
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    <Header/>
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const response = await fetch('/api/posts');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch posts');
+                }
+                const data = await response.json();
+                setPosts(data);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to load posts');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-      <div className={styles.containerStyle}>
-    <section className={styles.content}>
-<SideBar/>
-    </section>
+        fetchPosts();
+    }, []);
 
-<div className={styles.grouper}>
-  <h1 className={styles.title}>ALL BOOKS</h1>
-  <ul className={styles.ulGroupStyle}>
-    {
-      books.map((book,i)=>
-        <motion.li 
-        whileHover={{scale:1.1}}
-        whileTap={{scale:0.9}}
-        transition={{type:'spring',damping:50,mass:0.75}}
-        initial={{opacity:0,x:200*(i+1)}}
-        animate={{opacity:1,x:0}}
-        key={i}>
-          <a href={`/book/${book.id}`} style={{textDecoration:'none'}} >
-           <BookCard title={book.title} coverImage={book.image} description={book.description} />
-          </a>
-        </motion.li>
-      )
+    if (loading) {
+        return <div className={styles.loading}>Loading posts...</div>;
     }
-  </ul>
-</div>
 
-      </div>
+    if (error) {
+        return <div className={styles.error}>{error}</div>;
+    }
 
-  </div>
-    </main>
-  )
+    return (
+        <main className={styles.main}>
+            <Header/>
+            <div className={styles.container}>
+                <div className={styles.titleContainer}>
+                    <h1 className={styles.title}>APPRENEZ ET PARTAGEZ</h1>
+                    {user && (
+                        <Link href="/create-post">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className={styles.createPostButton}
+                            >
+                                <i className="fas fa-plus" /> Cree un post
+                            </motion.button>
+                        </Link>
+                    )}
+                </div>
+
+                <motion.ul 
+                    className={styles.postsGrid}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    {posts.map((post, i) => (
+                        <motion.li 
+                            key={post.id}
+                            className={styles.postItem}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            whileHover={{ y: -5 }}
+                        >
+                            <Link href={`/post/${post.id}`} className={styles.postLink}>
+                                <PostCard 
+                                    title={post.title} 
+                                    image={post.image} 
+                                    author={post.author}
+                                />
+                            </Link>
+                        </motion.li>
+                    ))}
+                </motion.ul>
+            </div>
+        </main>
+    );
 }
 
 
