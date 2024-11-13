@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface User {
     id: number;
@@ -19,13 +20,45 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const response = await fetch('/api/auth/check');
+                if (response.ok) {
+                    const userData = await response.json();
+                    setUser(userData);
+                } else {
+                    setUser(null);
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                setUser(null);
+            }
+        };
+
+        checkAuth();
+    }, []);
 
     const login = (userData: User) => {
         setUser(userData);
     };
 
-    const logout = () => {
-        setUser(null);
+    const logout = async () => {
+        try {
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                setUser(null);
+                router.push('/login');
+                router.refresh();
+            }
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
     };
 
     return (
