@@ -1,7 +1,9 @@
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 2;
 }
 
 .header {
@@ -9,6 +11,11 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    background: linear-gradient(135deg, var(--primary-green), var(--field-green));
+    padding: 1.5rem 2rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(45, 90, 39, 0.2);
+    border: 2px solid var(--accent-white);
 }
 
 .actions {
@@ -28,58 +35,29 @@
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    border: 2px solid;
+    border: 2px solid var(--accent-white);
+    background: var(--dark-brown);
+    color: var(--accent-white);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-.backButton {
-    background: transparent;
-    border-color: #000;
-    color: #000;
-}
-
-.backButton:hover {
-    background: #000;
-    color: #fff;
-}
-
-.editButton {
-    background: transparent;
-    border-color: #2563eb;
-    color: #2563eb;
-}
-
-.editButton:hover {
-    background: #2563eb;
-    color: #fff;
-}
-
-.saveButton {
-    background: transparent;
-    border-color: #059669;
-    color: #059669;
-}
-
-.saveButton:hover {
-    background: #059669;
-    color: #fff;
-}
-
-.deleteButton {
-    background: transparent;
-    border-color: #dc2626;
-    color: #dc2626;
-}
-
+.backButton:hover,
+.editButton:hover,
+.saveButton:hover,
 .deleteButton:hover {
-    background: #dc2626;
-    color: #fff;
+    background-color: white;
+    color: var(--primary-green);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
 }
 
 .article {
-    background: white;
-    border-radius: 12px;
+    background: var(--accent-white);
+    border-radius: 15px;
+    border: 2px solid var(--field-green);
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    box-shadow: 0 4px 15px rgba(45, 90, 39, 0.1);
 }
 
 .imageContainer {
@@ -108,7 +86,8 @@
     font-size: 2.5rem;
     font-weight: 700;
     margin: 0 0 1.5rem 0;
-    color: #111827;
+    color: var(--primary-green);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .meta {
@@ -153,14 +132,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 400px;
+    min-height: 50vh;
 }
 
 .loadingSpinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
+    width: 30px;
+    height: 30px;
+    border: 4px solid var(--light-green);
+    border-top: 4px solid var(--primary-green);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -168,10 +147,14 @@
 .errorContainer {
     text-align: center;
     padding: 4rem 2rem;
+    background: var(--accent-white);
+    border-radius: 15px;
+    border: 2px solid var(--field-green);
+    margin-top: 2rem;
 }
 
 .errorMessage {
-    color: #dc2626;
+    color: var(--primary-green);
     font-size: 1.2rem;
     margin-bottom: 2rem;
 }
@@ -192,7 +175,7 @@
     font-size: 1.1rem;
     line-height: 1.8;
     color: #374151;
-    border: 1px solid #e5e7eb;
+    border: 2px solid var(--field-green);
     border-radius: 8px;
     resize: vertical;
     font-family: inherit;
@@ -200,8 +183,8 @@
 
 .editor:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.1);
 }
 
 /* Responsive design */
@@ -256,4 +239,20 @@
     .image {
         height: 300px !important;
     }
+}
+
+.main {
+    min-height: 100vh;
+    position: relative;
+}
+
+.main::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-green);
+    z-index: 0;
 }

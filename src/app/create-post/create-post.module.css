@@ -1,20 +1,41 @@
+.main {
+  min-height: 100vh;
+  position: relative;
+}
+
+.main::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-green);
+  z-index: 0;
+}
+
 .container {
     max-width: 800px;
     margin: 2rem auto;
     padding: 0 1rem;
+    position: relative;
+    z-index: 2;
 }
 
 .container h1 {
-    color: #333;
+    color: var(--accent-white);
     margin-bottom: 2rem;
     text-align: center;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .form {
-    background: #ffffff;
+    background: var(--accent-white);
     padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    border: 2px solid var(--field-green);
+    box-shadow: 0 4px 15px rgba(45, 90, 39, 0.1);
 }
 
 .formGroup {
@@ -24,7 +45,7 @@
 .formGroup label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #666;
+    color: var(--primary-green);
     font-weight: 500;
 }
 
@@ -32,70 +53,136 @@
 .formGroup textarea {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #e1e1e1;
-    border-radius: 4px;
+    border: 2px solid var(--field-green);
+    border-radius: 8px;
     font-size: 1rem;
-    transition: border-color 0.2s;
+    transition: all 0.2s ease;
 }
 
 .formGroup input:focus,
 .formGroup textarea:focus {
     outline: none;
-    border-color: #0070f3;
-}
-
-.formGroup textarea {
-    min-height: 150px;
-    resize: vertical;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.1);
 }
 
 .submitButton {
     width: 100%;
     padding: 1rem;
-    background-color: #0070f3;
-    color: white;
-    border: none;
-    border-radius: 4px;
+    background: var(--dark-brown);
+    color: var(--accent-white);
+    border: 2px solid var(--field-green);
+    border-radius: 30px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
 }
 
 .submitButton:hover {
-    background-color: #0051a2;
+    background-color: white;
+    color: var(--primary-green);
+    box-shadow: 0 4px 12px rgba(45, 90, 39, 0.2);
 }
 
 .submitButton:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+    opacity: 0.7;
 }
 
 .error {
-    color: #dc3545;
-    background-color: #f8d7da;
+    color: var(--primary-green);
+    background: var(--accent-white);
     padding: 1rem;
-    border-radius: 4px;
+    border-radius: 15px;
     margin-bottom: 1rem;
     text-align: center;
+    border: 2px solid var(--field-green);
 }
 
-/* Responsive Design */
+.dropzone {
+    border: 2px dashed var(--field-green);
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--primary-green);
+}
+
+.dragActive {
+    border-color: var(--primary-green);
+    background-color: rgba(45, 90, 39, 0.1);
+}
+
+.imagePreview {
+    position: relative;
+    display: inline-block;
+}
+
+.removeImage {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--dark-brown);
+    color: var(--accent-white);
+    border: 2px solid var(--field-green);
+    border-radius: 30px;
+    padding: 0.25rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.removeImage:hover {
+    background-color: white;
+    color: var(--primary-green);
+    box-shadow: 0 4px 12px rgba(45, 90, 39, 0.2);
+}
+
+.titleContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, var(--primary-green), var(--field-green));
+    padding: 1rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(45, 90, 39, 0.2);
+    border: 2px solid var(--accent-white);
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-white);
+    margin: 0;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 @media (max-width: 768px) {
-    .container {
-        margin: 1rem auto;
+    .titleContainer {
+        padding: 0.75rem;
     }
-
-    .form {
-        padding: 1rem;
+    
+    .title {
+        font-size: 1.25rem;
     }
+}
 
-    .formGroup input,
-    .formGroup textarea {
+@media (max-width: 480px) {
+    .titleContainer {
         padding: 0.5rem;
     }
-
-    .submitButton {
-        padding: 0.75rem;
+    
+    .title {
+        font-size: 1.1rem;
     }
 }

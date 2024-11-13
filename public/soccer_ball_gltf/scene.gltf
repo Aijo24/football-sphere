@@ -1,0 +1,268 @@
+{
+  "accessors": [
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 37057,
+      "max": [
+        0.8502674102783203,
+        0.8534935712814331,
+        1.6560688018798828
+      ],
+      "min": [
+        -0.8502679467201233,
+        -0.8534935712814331,
+        0.02231411263346672
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 444684,
+      "componentType": 5126,
+      "count": 37057,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 37057,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 178560,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 889368,
+      "componentType": 5126,
+      "count": 10042,
+      "max": [
+        0.8351328372955322,
+        0.8300740718841553,
+        1.6891268491744995
+      ],
+      "min": [
+        -0.8351333737373352,
+        -0.8300740718841553,
+        -0.010743590071797371
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 1009872,
+      "componentType": 5126,
+      "count": 10042,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 296456,
+      "componentType": 5126,
+      "count": 10042,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 714240,
+      "componentType": 5125,
+      "count": 46080,
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "generator": "fab-model-conversion",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 898560,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 376792,
+      "byteOffset": 898560,
+      "byteStride": 8,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1130376,
+      "byteOffset": 1275352,
+      "byteStride": 12,
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 2405728,
+      "uri": "scene.bin"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "White",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.8,
+          0.8,
+          0.8,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8146074879343552
+      }
+    },
+    {
+      "doubleSided": true,
+      "name": "Black",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.00364143,
+          0.00364143,
+          0.00364143,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.453
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Icosphere_White_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Icosphere_Black_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 5,
+            "POSITION": 4,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "material": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.220446049250313e-16,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        2.220446049250313e-16,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "Sketchfab_model"
+    },
+    {
+      "children": [
+        2
+      ],
+      "matrix": [
+        0.009999999776482582,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.009999999776482582,
+        0.0,
+        0.0,
+        -0.009999999776482582,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "71fb7f9b628644428ff133e3c8f97688.fbx"
+    },
+    {
+      "children": [
+        3
+      ],
+      "name": "RootNode"
+    },
+    {
+      "children": [
+        4,
+        5
+      ],
+      "matrix": [
+        81.89722119504519,
+        5.551115123125783e-15,
+        -57.383317789492104,
+        0.0,
+        -57.38331778949206,
+        -4.371138984105016e-06,
+        -81.8972211950451,
+        0.0,
+        -2.5083045807061666e-06,
+        99.99999999999989,
+        -3.579841356682323e-06,
+        0.0,
+        3.226945045753382e-05,
+        0.0,
+        -9.42403701742478e-08,
+        1.0
+      ],
+      "name": "Icosphere"
+    },
+    {
+      "mesh": 0,
+      "name": "Icosphere_White_0"
+    },
+    {
+      "mesh": 1,
+      "name": "Icosphere_Black_0"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Sketchfab_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ]
+}

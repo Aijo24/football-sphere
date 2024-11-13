@@ -4,16 +4,17 @@ import { createContext, useContext, useState, ReactNode, useEffect } from 'react
 import { useRouter } from 'next/navigation';
 
 interface User {
-    id: number;
-    name: string;
+    id: string;
     email: string;
-    role: string;
+    name: string;
+    role: 'USER' | 'ADMIN' | 'MODERATOR';
 }
 
 interface AuthContextType {
     user: User | null;
-    login: (userData: User) => void;
-    logout: () => void;
+    loading: boolean;
+    signIn: (email: string, password: string) => Promise<void>;
+    signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,8 +42,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         checkAuth();
     }, []);
 
-    const login = (userData: User) => {
-        setUser(userData);
+    const login = (userData: any) => {
+        setUser({
+            id: userData.id,
+            name: userData.name,
+            email: userData.email,
+            role: userData.role
+        });
     };
 
     const logout = async () => {

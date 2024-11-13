@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import PostCard from '@/components/PostCard'
 import Header from '@/components/Header'
 import { motion } from 'framer-motion'
@@ -8,21 +9,27 @@ import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 
 interface Post {
-    id: number;
+    id: string;
     title: string;
     content: string;
-    image: string;
+    image: string | null;
     author: string;
     created_at: string;
 }
 
 export default function Home() {
     const { user } = useAuth();
+    const router = useRouter();
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+
         const fetchPosts = async () => {
             try {
                 const response = await fetch('/api/posts');
@@ -39,7 +46,11 @@ export default function Home() {
         };
 
         fetchPosts();
-    }, []);
+    }, [user, router]);
+
+    if (!user) {
+        return null;
+    }
 
     if (loading) {
         return <div className={styles.loading}>Loading posts...</div>;
@@ -55,17 +66,15 @@ export default function Home() {
             <div className={styles.container}>
                 <div className={styles.titleContainer}>
                     <h1 className={styles.title}>APPRENEZ ET PARTAGEZ</h1>
-                    {user && (
-                        <Link href="/create-post">
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className={styles.createPostButton}
-                            >
-                                <i className="fas fa-plus" /> Cree un post
-                            </motion.button>
-                        </Link>
-                    )}
+                    <Link href="/create-post">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className={styles.createPostButton}
+                        >
+                            <i className="fas fa-plus" /> Cree un post
+                        </motion.button>
+                    </Link>
                 </div>
 
                 <motion.ul 
@@ -83,13 +92,12 @@ export default function Home() {
                             transition={{ delay: i * 0.1 }}
                             whileHover={{ y: -5 }}
                         >
-                            <Link href={`/post/${post.id}`} className={styles.postLink}>
-                                <PostCard 
-                                    title={post.title} 
-                                    image={post.image} 
-                                    author={post.author}
-                                />
-                            </Link>
+                            <PostCard 
+                                id={post.id}
+                                title={post.title} 
+                                image={post.image} 
+                                author={post.author}
+                            />
                         </motion.li>
                     ))}
                 </motion.ul>

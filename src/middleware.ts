@@ -2,32 +2,45 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-    const userCookie = request.cookies.get('user');
-    const isAuthPage = request.nextUrl.pathname.startsWith('/login') || 
-                      request.nextUrl.pathname.startsWith('/signup');
+    const user = request.cookies.get('user');
     
-    // Debug logging
-    console.log('Current path:', request.nextUrl.pathname);
-    console.log('User cookie exists:', !!userCookie);
-    console.log('Is auth page:', isAuthPage);
+    // Public paths that don't require authentication
+    const publicPaths = ['/login', '/signup'];
+    
+    // Check if the current path is public
+    const isPublicPath = publicPaths.some(path => 
+        request.nextUrl.pathname.startsWith(path)
+    );
 
-    if (userCookie && isAuthPage) {
-        console.log('Redirecting to home from auth page');
+    // If the path is public and user is logged in, redirect to home
+    if (isPublicPath && user) {
         return NextResponse.redirect(new URL('/', request.url));
     }
 
-    if (!userCookie && request.nextUrl.pathname.startsWith('/profile')) {
-        console.log('Redirecting to login from protected route');
+    // If the path is not public and user is not logged in, redirect to login
+    if (!isPublicPath && !user) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    return NextResponse.next();
+    // Add CORS headers
+    const response = NextResponse.next();
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    return response;
 }
 
 export const config = {
     matcher: [
-        '/profile/:path*',
-        '/login',
-        '/signup'
+        /*
+         * Match all request paths except:
+         * - api routes
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         * - public files (public folder)
+         */
+        '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
     ],
 };

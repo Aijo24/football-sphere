@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Lora } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/context/AuthContext'
+import Background3D from '@/components/Background3D'
 
 const inter = Lora({ subsets: ['latin'] })
 
@@ -17,7 +18,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
+        <Background3D />
         <AuthProvider>
           {children}
         </AuthProvider>

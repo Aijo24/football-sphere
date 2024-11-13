@@ -1,14 +1,20 @@
 :root {
-    --primary-blue: #1e40af;
-    --light-blue: #dbeafe;
-    --dark-blue: #1e3a8a;
-    --accent-blue: #3b82f6;
-    --text-blue: #1e3a8a;
-    --bg-blue: #f0f9ff;
+    /* Football theme colors */
+    --primary-green: #2D5A27;  /* Dark grass green */
+    --light-green: #8CB369;    /* Light grass green */
+    --field-green: #4A7C59;    /* Medium grass green */
+    --accent-white: #FFFFFF;   /* White for lines */
+    --dark-brown: #5C4033;     /* Brown for football/leather */
+    --light-brown: #8B7355;    /* Lighter brown */
+    --bg-green: #F1F8E9;       /* Very light green background */
 }
 
 body {
-    background-color: var(--bg-blue);
+    background-color: var(--bg-green);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+                      url('/football-field-bg.png'); /* Add a subtle field texture */
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 h1 h2 h3 h4 p span li a {

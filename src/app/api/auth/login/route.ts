@@ -1,64 +1,31 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
-import path from 'path';
-
-async function getDb() {
-    try {
-        const dbPath = path.join(process.cwd(), 'data', 'database.sqlite');
-        console.log('Attempting to connect to database at:', dbPath);
-        
-        return await open({
-            filename: dbPath,
-            driver: sqlite3.Database
-        });
-    } catch (error) {
-        console.error('Database connection error:', error);
-        throw error;
-    }
-}
+import { supabase } from '@/lib/supabase';
 
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { username, password } = body;
 
-        console.log('Login attempt with:', { username, password });
+        console.log('Login attempt for:', username);
 
-        let db;
         try {
-            db = await getDb();
-            
-            // First, let's check if the database has any users
-            const allUsers = await db.all('SELECT * FROM users');
-            console.log('All users in database:', allUsers);
+            // Query user from Supabase
+            const { data: user, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('name', username)
+                .eq('password', password)
+                .single();
 
-            // Now try to find our specific user
-            const user = await db.get(
-                'SELECT * FROM users WHERE name = ?', 
-                [username]
-            );
-            console.log('Found user:', user);
-
-            if (!user) {
-                console.log('No user found with this username');
+            if (error || !user) {
+                console.error('Login error:', error);
                 return NextResponse.json(
-                    { success: false, error: 'User not found' },
+                    { success: false, error: 'Invalid username or password' },
                     { status: 401 }
                 );
             }
 
-            // Check password
-            if (user.password !== password) {
-                console.log('Password mismatch');
-                return NextResponse.json(
-                    { success: false, error: 'Invalid password' },
-                    { status: 401 }
-                );
-            }
-
-            // If we get here, login is successful
             const userData = {
                 id: user.id,
                 name: user.name,
@@ -79,14 +46,12 @@ export async function POST(request: Request) {
                 user: userData
             });
 
-        } catch (error) {
-            console.error('Database error:', error);
+        } catch (dbError) {
+            console.error('Database error:', dbError);
             return NextResponse.json(
                 { success: false, error: 'Database error' },
                 { status: 500 }
             );
-        } finally {
-            if (db) await db.close();
         }
 
     } catch (error) {

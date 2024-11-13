@@ -1,36 +1,39 @@
 import { NextResponse } from 'next/server';
-import sqlite3 from 'sqlite3';
-import path from 'path';
-
-const db = new sqlite3.Database(path.join(process.cwd(), 'data', 'database.sqlite'));
+import { supabase } from '@/lib/supabase';
 
 export async function GET(): Promise<Response> {
     try {
-        return new Promise<Response>((resolve) => {
-            db.all(
-                `SELECT 
-                    p.*,
-                    u.name as author
-                FROM posts p
-                JOIN users u ON p.author_id = u.id
-                ORDER BY p.created_at DESC`,
-                [],
-                (err, posts) => {
-                    if (err) {
-                        console.error('Database error:', err);
-                        resolve(NextResponse.json(
-                            { error: 'Failed to fetch posts' },
-                            { status: 500 }
-                        ));
-                        return;
-                    }
+        const { data: posts, error } = await supabase
+            .from('posts')
+            .select(`
+                *,
+                users (
+                    name
+                )
+            `)
+            .order('created_at', { ascending: false });
 
-                    resolve(NextResponse.json(posts || []));
-                }
+        if (error) {
+            console.error('Database error:', error);
+            return NextResponse.json(
+                { error: 'Failed to fetch posts' },
+                { status: 500 }
             );
-        });
+        }
+
+        const formattedPosts = posts.map(post => ({
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            image: post.image,
+            author: post.users.name,
+            author_id: post.author_id,
+            created_at: post.created_at
+        }));
+
+        return NextResponse.json(formattedPosts);
     } catch (error) {
-        console.error('Error fetching posts:', error);
+        console.error('Error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -49,46 +52,44 @@ export async function POST(request: Request): Promise<Response> {
             );
         }
 
-        return new Promise<Response>((resolve) => {
-            db.run(
-                `INSERT INTO posts (title, content, image, author_id, created_at) 
-                VALUES (?, ?, ?, ?, datetime('now'))`,
-                [title, content, image, author_id],
-                function(err) {
-                    if (err) {
-                        console.error('Database error:', err);
-                        resolve(NextResponse.json(
-                            { error: 'Failed to create post' },
-                            { status: 500 }
-                        ));
-                        return;
-                    }
-
-                    // Get the created post with author information
-                    db.get(
-                        `SELECT 
-                            p.*,
-                            u.name as author
-                        FROM posts p
-                        JOIN users u ON p.author_id = u.id
-                        WHERE p.id = ?`,
-                        [this.lastID],
-                        (err, post) => {
-                            if (err) {
-                                console.error('Error fetching created post:', err);
-                                resolve(NextResponse.json(
-                                    { error: 'Post created but failed to fetch details' },
-                                    { status: 500 }
-                                ));
-                                return;
-                            }
-
-                            resolve(NextResponse.json(post));
-                        }
-                    );
+        const { data: post, error } = await supabase
+            .from('posts')
+            .insert([
+                { 
+                    title, 
+                    content, 
+                    image, 
+                    author_id 
                 }
+            ])
+            .select(`
+                *,
+                users:author_id (
+                    name
+                )
+            `)
+            .single();
+
+        if (error) {
+            console.error('Database error:', error);
+            return NextResponse.json(
+                { error: 'Failed to create post' },
+                { status: 500 }
             );
-        });
+        }
+
+        // Transform the response
+        const formattedPost = {
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            image: post.image,
+            author: post.users.name,
+            created_at: post.created_at,
+            author_id: post.author_id
+        };
+
+        return NextResponse.json(formattedPost);
     } catch (error) {
         console.error('Error creating post:', error);
         return NextResponse.json(
@@ -98,7 +99,6 @@ export async function POST(request: Request): Promise<Response> {
     }
 }
 
-// Optional: Add a DELETE method to delete multiple posts
 export async function DELETE(request: Request): Promise<Response> {
     try {
         const { postIds } = await request.json();
@@ -110,28 +110,22 @@ export async function DELETE(request: Request): Promise<Response> {
             );
         }
 
-        return new Promise<Response>((resolve) => {
-            const placeholders = postIds.map(() => '?').join(',');
-            
-            db.run(
-                `DELETE FROM posts WHERE id IN (${placeholders})`,
-                postIds,
-                function(err) {
-                    if (err) {
-                        console.error('Database error:', err);
-                        resolve(NextResponse.json(
-                            { error: 'Failed to delete posts' },
-                            { status: 500 }
-                        ));
-                        return;
-                    }
+        const { error, count } = await supabase
+            .from('posts')
+            .delete()
+            .in('id', postIds);
 
-                    resolve(NextResponse.json({ 
-                        message: 'Posts deleted successfully',
-                        count: this.changes
-                    }));
-                }
+        if (error) {
+            console.error('Database error:', error);
+            return NextResponse.json(
+                { error: 'Failed to delete posts' },
+                { status: 500 }
             );
+        }
+
+        return NextResponse.json({
+            message: 'Posts deleted successfully',
+            count
         });
     } catch (error) {
         console.error('Error deleting posts:', error);

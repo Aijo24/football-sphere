@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
-import sqlite3 from 'sqlite3';
-import path from 'path';
-
-const db = new sqlite3.Database(path.join(process.cwd(), 'data', 'database.sqlite'));
+import { supabase } from '@/lib/supabase';
 
 export async function GET(
     request: Request,
@@ -10,40 +7,47 @@ export async function GET(
 ): Promise<Response> {
     try {
         const postId = params.id;
+        console.log('Fetching post:', postId);
 
-        return new Promise<Response>((resolve) => {
-            db.get(
-                `SELECT 
-                    p.*,
-                    u.name as author
-                FROM posts p
-                JOIN users u ON p.author_id = u.id
-                WHERE p.id = ?`,
-                [postId],
-                (err, post) => {
-                    if (err) {
-                        console.error('Database error:', err);
-                        resolve(NextResponse.json(
-                            { error: 'Failed to fetch post' },
-                            { status: 500 }
-                        ));
-                        return;
-                    }
+        const { data: post, error } = await supabase
+            .from('posts')
+            .select(`
+                *,
+                users (
+                    name
+                )
+            `)
+            .eq('id', postId)
+            .single();
 
-                    if (!post) {
-                        resolve(NextResponse.json(
-                            { error: 'Post not found' },
-                            { status: 404 }
-                        ));
-                        return;
-                    }
-
-                    resolve(NextResponse.json(post));
-                }
+        if (error) {
+            console.error('Database error:', error);
+            return NextResponse.json(
+                { error: 'Post not found' },
+                { status: 404 }
             );
-        });
+        }
+
+        if (!post) {
+            return NextResponse.json(
+                { error: 'Post not found' },
+                { status: 404 }
+            );
+        }
+
+        const formattedPost = {
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            image: post.image,
+            author: post.users.name,
+            author_id: post.author_id,
+            created_at: post.created_at
+        };
+
+        return NextResponse.json(formattedPost);
     } catch (error) {
-        console.error('Error fetching post:', error);
+        console.error('Error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -57,34 +61,45 @@ export async function DELETE(
 ): Promise<Response> {
     try {
         const postId = params.id;
+        const body = await request.json();
+        const { user_id, role } = body;
 
-        return new Promise<Response>((resolve) => {
-            db.run(
-                'DELETE FROM posts WHERE id = ?',
-                [postId],
-                function(err) {
-                    if (err) {
-                        console.error('Database error:', err);
-                        resolve(NextResponse.json(
-                            { error: 'Failed to delete post' },
-                            { status: 500 }
-                        ));
-                        return;
-                    }
+        // Check if user has permission to delete
+        const { data: post } = await supabase
+            .from('posts')
+            .select('author_id')
+            .eq('id', postId)
+            .single();
 
-                    if (this.changes === 0) {
-                        resolve(NextResponse.json(
-                            { error: 'Post not found' },
-                            { status: 404 }
-                        ));
-                        return;
-                    }
-
-                    resolve(NextResponse.json({ 
-                        message: 'Post deleted successfully' 
-                    }));
-                }
+        if (!post) {
+            return NextResponse.json(
+                { error: 'Post not found' },
+                { status: 404 }
             );
+        }
+
+        if (post.author_id !== user_id && role !== 'ADMIN' && role !== 'MODERATOR') {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 403 }
+            );
+        }
+
+        const { error } = await supabase
+            .from('posts')
+            .delete()
+            .eq('id', postId);
+
+        if (error) {
+            console.error('Database error:', error);
+            return NextResponse.json(
+                { error: 'Failed to delete post' },
+                { status: 500 }
+            );
+        }
+
+        return NextResponse.json({ 
+            message: 'Post deleted successfully' 
         });
     } catch (error) {
         console.error('Error deleting post:', error);
@@ -101,42 +116,44 @@ export async function PUT(
 ): Promise<Response> {
     try {
         const postId = params.id;
-        const { title, content, image } = await request.json();
+        const { content, author_id } = await request.json();
 
-        if (!title || !content) {
+        // Check if user owns the post
+        const { data: post } = await supabase
+            .from('posts')
+            .select('author_id')
+            .eq('id', postId)
+            .single();
+
+        if (!post) {
             return NextResponse.json(
-                { error: 'Title and content are required' },
-                { status: 400 }
+                { error: 'Post not found' },
+                { status: 404 }
             );
         }
 
-        return new Promise<Response>((resolve) => {
-            db.run(
-                'UPDATE posts SET title = ?, content = ?, image = ? WHERE id = ?',
-                [title, content, image, postId],
-                function(err) {
-                    if (err) {
-                        console.error('Database error:', err);
-                        resolve(NextResponse.json(
-                            { error: 'Failed to update post' },
-                            { status: 500 }
-                        ));
-                        return;
-                    }
-
-                    if (this.changes === 0) {
-                        resolve(NextResponse.json(
-                            { error: 'Post not found' },
-                            { status: 404 }
-                        ));
-                        return;
-                    }
-
-                    resolve(NextResponse.json({ 
-                        message: 'Post updated successfully' 
-                    }));
-                }
+        if (post.author_id !== author_id) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 403 }
             );
+        }
+
+        const { error } = await supabase
+            .from('posts')
+            .update({ content })
+            .eq('id', postId);
+
+        if (error) {
+            console.error('Database error:', error);
+            return NextResponse.json(
+                { error: 'Failed to update post' },
+                { status: 500 }
+            );
+        }
+
+        return NextResponse.json({ 
+            message: 'Post updated successfully' 
         });
     } catch (error) {
         console.error('Error updating post:', error);
