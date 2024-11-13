@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
+import Header from '@/components/Header'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import styles from './profile.module.css'
@@ -49,6 +50,7 @@ export default function ProfilePage() {
     return (
         <div className={styles.main}>
             <div className={styles.container}>
+            <Header/>
                 <div className={styles.titleContainer}>
                     <h1 className={styles.title}>My Profile</h1>
                     <Link href="/create-post">

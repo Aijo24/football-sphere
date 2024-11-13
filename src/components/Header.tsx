@@ -96,7 +96,9 @@ export default function Header() {
                 initial={{opacity:0,x:-1000}} 
                 animate={{opacity:1,x:0}}
             >
-                <h1 className={styles.bookTitle}>Football Sphere</h1>
+                <Link href="/">
+                    <h1 className={styles.bookTitle}>Football Sphere</h1>
+                </Link>
                 <div className={styles.searchContainer}>
                     <motion.input 
                         type="text" 
@@ -168,7 +170,7 @@ export default function Header() {
                 transition={{type:'spring',damping:18,mass:0.75}}
                 initial={{opacity:0,x:1000}} 
                 animate={{opacity:1,x:0}}
-            >Football Sphere
+            >
 
                 {user && (
                     <div className={styles.userContainer}>

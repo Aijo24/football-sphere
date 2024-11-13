@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
+import Link from 'next/link'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import styles from './change-password.module.css'
@@ -47,7 +48,7 @@ export default function ChangePassword() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (newPassword !== confirmPassword) {
             toast.error('New passwords do not match');
             return;
@@ -55,7 +56,7 @@ export default function ChangePassword() {
 
         try {
             console.log('Submitting password change request...');
-            
+
             const response = await fetch('/api/auth/change-password', {
                 method: 'POST',
                 headers: {
@@ -90,8 +91,12 @@ export default function ChangePassword() {
 
     return (
         <div className={styles.container}>
+            <Link href="/">
+                <p>Retour</p>
+            </Link>
             <h1 className={styles.title}>Change Password</h1>
-            
+
+
             <form onSubmit={handleSubmit} className={styles.form}>
                 {user?.role === 'ADMIN' && (
                     <div className={styles.formGroup}>
@@ -156,8 +161,8 @@ export default function ChangePassword() {
                     />
                 </div>
 
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     className={styles.button}
                     disabled={loading}
                 >

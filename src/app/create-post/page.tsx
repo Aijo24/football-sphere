@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useDropzone } from 'react-dropzone';
+import Header from '@/components/Header'
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import styles from './create-post.module.css';
@@ -124,6 +125,7 @@ export default function CreatePost() {
 
     return (
         <div className={styles.main}>
+            <Header/>
             <div className={styles.container}>
                 <div className={styles.titleContainer}>
                     <h1 className={styles.title}>Create New Post</h1>

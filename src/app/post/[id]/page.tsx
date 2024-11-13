@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useAuth } from '@/context/AuthContext'
+import Header from '@/components/Header'
 import Image from 'next/image'
 import styles from './post.module.css'
 
@@ -177,6 +178,7 @@ export default function PostPage() {
     return (
         <motion.div className={styles.main}>
             <div className={styles.container}>
+                <Header/>
                 <header className={styles.header}>
                     <button 
                         className={styles.backButton}
