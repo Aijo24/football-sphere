@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function SignupForm() {
-    const [username, setUsername] = useState('');
+    const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
@@ -15,7 +15,6 @@ export default function SignupForm() {
         e.preventDefault();
         setError('');
 
-        // Password validation
         if (password !== confirmPassword) {
             setError('Passwords do not match');
             return;
@@ -33,7 +32,7 @@ export default function SignupForm() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username,
+                    name,
                     password,
                 }),
             });
@@ -43,7 +42,6 @@ export default function SignupForm() {
                 throw new Error(data.error || 'Signup failed');
             }
 
-            // Signup successful
             router.push('/login');
         } catch (err: any) {
             setError(err.message || 'An error occurred during signup');
@@ -66,17 +64,17 @@ export default function SignupForm() {
                         </div>
                     )}
                     <div>
-                        <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                            Username
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                            Name
                         </label>
                         <input
-                            id="username"
-                            name="username"
+                            id="name"
+                            name="name"
                             type="text"
                             required
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             minLength={3}
                         />
                     </div>
