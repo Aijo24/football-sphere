@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Header from '@/components/Header'
 import PostCard from '@/components/PostCard'
 import styles from './search.module.css'
 
@@ -69,6 +70,7 @@ export default function SearchPage() {
 
     return (
         <div className={styles.container}>
+            <Header/>
             <div className={styles.searchHeader}>
                 <h1>Search Results</h1>
                 <p className={styles.searchInfo}>
