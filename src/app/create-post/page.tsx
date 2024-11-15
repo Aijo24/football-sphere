@@ -117,13 +117,13 @@ export default function CreatePost() {
             <Header />
             <div className={styles.container}>
                 <Link href="/" className={styles.backLink}>
-                    ← Back to Home
+                    ← Retour à l'accueil
                 </Link>
-                <h1 className={styles.title}>Create New Post</h1>
+                <h1 className={styles.title}>Créer un nouveau post</h1>
                 
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <div className={styles.formGroup}>
-                        <label htmlFor="title">Title:</label>
+                        <label htmlFor="title">Titre:</label>
                         <input
                             type="text"
                             id="title"
@@ -135,7 +135,7 @@ export default function CreatePost() {
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label>Categories:</label>
+                        <label>Catégories:</label>
                         <div className={styles.categoriesGrid}>
                             {PREDEFINED_CATEGORIES.map(category => (
                                 <div key={category.id} className={styles.categoryItem}>
@@ -159,7 +159,7 @@ export default function CreatePost() {
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="imageUpload">Upload Image:</label>
+                        <label htmlFor="imageUpload">Importer une image:</label>
                         <input
                             type="file"
                             id="imageUpload"
@@ -168,7 +168,7 @@ export default function CreatePost() {
                             className={styles.fileInput}
                         />
                         <small className={styles.imageHint}>
-                            Maximum file size: 5MB
+                            Taille maximun du fichier: 5MB
                         </small>
                     </div>
 
@@ -186,13 +186,13 @@ export default function CreatePost() {
                                 onClick={handleRemoveImage}
                                 className={styles.removeImage}
                             >
-                                Remove Image
+                                Retirer l'image
                             </button>
                         </div>
                     )}
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="content">Content:</label>
+                        <label htmlFor="content">Contenu:</label>
                         <textarea
                             id="content"
                             value={content}
@@ -207,7 +207,7 @@ export default function CreatePost() {
                         className={styles.submitButton}
                         disabled={loading}
                     >
-                        {loading ? 'Creating...' : 'Create Post'}
+                        {loading ? 'Creating...' : 'Créer le post'}
                     </button>
                 </form>
             </div>

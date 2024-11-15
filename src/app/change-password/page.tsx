@@ -93,9 +93,9 @@ export default function ChangePassword() {
         <div className={styles.wrapper}>
             <div className={styles.container}>
                 <Link href="/" className={styles.backLink}>
-                    ← Back to Home
+                    ← Retour à l'accueil
                 </Link>
-                <h1 className={styles.title}>Change Password</h1>
+                <h1 className={styles.title}>Changer le mot de passe</h1>
                 
                 <form onSubmit={handleSubmit} className={styles.form}>
                     {user?.role === 'ADMIN' && (
@@ -123,7 +123,7 @@ export default function ChangePassword() {
 
                     {user?.role !== 'ADMIN' && (
                         <div className={styles.formGroup}>
-                            <label htmlFor="currentPassword">Current Password:</label>
+                            <label htmlFor="currentPassword">Mot de passe actuel:</label>
                             <input
                                 type="password"
                                 id="currentPassword"
@@ -136,7 +136,7 @@ export default function ChangePassword() {
                     )}
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="newPassword">New Password:</label>
+                        <label htmlFor="newPassword">Nouveau mot de passe:</label>
                         <input
                             type="password"
                             id="newPassword"
@@ -149,7 +149,7 @@ export default function ChangePassword() {
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label htmlFor="confirmPassword">Confirm New Password:</label>
+                        <label htmlFor="confirmPassword">Confirmer le mot de passe :</label>
                         <input
                             type="password"
                             id="confirmPassword"
@@ -166,7 +166,7 @@ export default function ChangePassword() {
                         className={styles.button}
                         disabled={loading}
                     >
-                        {loading ? 'Processing...' : 'Change Password'}
+                        {loading ? 'Processing...' : 'Changer le mot de passe'}
                     </button>
                 </form>
                 <ToastContainer />

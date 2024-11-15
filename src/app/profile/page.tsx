@@ -52,20 +52,20 @@ export default function ProfilePage() {
             <Header />
             <div className={styles.container}>
                 <div className={styles.titleContainer}>
-                    <h1 className={styles.title}>My Profile</h1>
+                    <h1 className={styles.title}>Mon profil</h1>
                     <Link href="/create-post">
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className={styles.createPostButton}
                         >
-                            <i className="fas fa-plus" /> Create Post
+                            <i className="fas fa-plus" /> Créer un post
                         </motion.button>
                     </Link>
                 </div>
 
                 {loading ? (
-                    <div className={styles.loading}>Loading posts...</div>
+                    <div className={styles.loading}>Chargement des posts...</div>
                 ) : posts.length > 0 ? (
                     <motion.div 
                         className={styles.postsGrid}
@@ -91,14 +91,14 @@ export default function ProfilePage() {
                     </motion.div>
                 ) : (
                     <div className={styles.noPosts}>
-                        <p>You haven't created any posts yet.</p>
+                        <p>Vous n'avez créer aucun post pour l'instant.</p>
                         <Link href="/create-post">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className={styles.createPostButton}
                             >
-                                <i className="fas fa-plus" /> Create Your First Post
+                                <i className="fas fa-plus" /> Créer un nouveau post
                             </motion.button>
                         </Link>
                     </div>

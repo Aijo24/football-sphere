@@ -43,7 +43,7 @@ export default function PostCard({ id, title, image, author, categories }: PostC
             )}
             <div className={`${styles.content} ${!image ? styles.noImage : ''}`}>
                 <h2 className={styles.title}>{title}</h2>
-                <p className={styles.author}>by {author}</p>
+                <p className={styles.author}>Par {author}</p>
                 {categories && categories.length > 0 && (
                     <div className={styles.categories}>
                         {categories.map((category, index) => (

@@ -109,7 +109,7 @@ export default function Header() {
                                 router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
                             }
                         }}
-                        placeholder='Search posts or authors...'
+                        placeholder='Chercher un post ou un auteur...'
                         className={styles.searchInput}
                         initial={{opacity:0,x:-100}}
                         animate={{opacity:1,x:0}}
@@ -117,7 +117,7 @@ export default function Header() {
                     {searchTerm.trim() && (
                         <div className={styles.searchResults}>
                             {isSearching ? (
-                                <div className={styles.loading}>Searching...</div>
+                                <div className={styles.loading}>Recherche en cours...</div>
                             ) : searchResults.length > 0 ? (
                                 <div>
                                     {searchResults.map((result: SearchResult) => (
@@ -150,7 +150,7 @@ export default function Header() {
                                                             setSearchTerm('');
                                                         }}
                                                     >
-                                                        by {result.author}
+                                                        Par {result.author}
                                                     </Link>
                                                 </div>
                                             </div>
@@ -158,7 +158,7 @@ export default function Header() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className={styles.noResults}>No results found</div>
+                                <div className={styles.noResults}>Aucun résultat trouvé</div>
                             )}
                         </div>
                     )}
@@ -184,13 +184,13 @@ export default function Header() {
                             onClick={handleLogout}
                             className={styles.button}
                         >
-                            Deconnexion
+                            Déconnexion
                         </button>
                     </div>
                 )}
 
                 <Link href="/profile" className={styles.button}>
-                    Profile
+                    Profil
                 </Link>
             </motion.div>
         </header>

@@ -146,7 +146,7 @@ export default function Home() {
                         <h2 className={styles.sectionTitle}>
                             {selectedCategory ? 
                                 `Posts dans ${PREDEFINED_CATEGORIES.find(c => c.id === selectedCategory)?.name}` : 
-                                'Derniers Posts'
+                                'Dérniers Posts'
                             }
                             <span className={styles.postCount}>({filteredPosts.length})</span>
                         </h2>
