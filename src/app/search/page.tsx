@@ -5,13 +5,10 @@ import PostCard from '@/components/PostCard'
 import styles from './search.module.css'
 
 interface SearchResult {
-    id: number;
+    id: string;
     title: string;
-    content: string;
     image: string;
     author: string;
-    created_at: string;
-    author_id: number;
 }
 
 export default function SearchPage() {
@@ -81,9 +78,10 @@ export default function SearchPage() {
                     {results.map((post: SearchResult) => (
                         <PostCard 
                             key={post.id}
+                            id={post.id}
                             title={post.title || 'Untitled'}
                             image={post.image || '/default-image.jpg'}
-                            author={post.author || 'Unknown Author'}
+                            author={post.author}
                         />
                     ))}
                 </div>
