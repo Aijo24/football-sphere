@@ -1,28 +1,38 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 
-// Define the Post type
-interface Post {
+// Définir l'interface correcte pour les données brutes de Supabase
+interface SupabasePost {
     id: string;
     title: string;
     content: string;
     image: string | null;
     author_id: string;
     created_at: string;
-    users?: {
+    users: {
         name: string | null;
-    };
+    }[];
 }
 
-// Initialize Supabase client
+// Définir l'interface pour le format de sortie
+interface Post {
+    id: string;
+    title: string;
+    content: string;
+    image: string | null;
+    author: string;
+    created_at: string;
+    categories: string[];
+}
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export async function GET(): Promise<Response> {
     try {
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        const cookieStore = cookies();
+        const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
         const { data: posts, error } = await supabase
             .from('posts')
@@ -40,28 +50,29 @@ export async function GET(): Promise<Response> {
             .order('created_at', { ascending: false });
 
         if (error) {
-            console.error('Database error:', error);
-            return NextResponse.json(
-                { error: 'Failed to fetch posts' },
-                { status: 500 }
-            );
+            throw error;
         }
 
-        const formattedPosts = (posts as Post[]).map(post => ({
+        if (!posts) {
+            return NextResponse.json([]);
+        }
+
+        // Convertir les données avec le bon typage
+        const formattedPosts: Post[] = (posts as SupabasePost[]).map(post => ({
             id: post.id,
             title: post.title,
             content: post.content,
             image: post.image,
-            author: post.users?.name || 'Unknown',
-            author_id: post.author_id,
-            created_at: post.created_at
+            author: post.users[0]?.name || 'Anonymous',
+            created_at: post.created_at,
+            categories: [], // Ajoutez les catégories si nécessaire
         }));
 
         return NextResponse.json(formattedPosts);
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error fetching posts:', error);
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: 'Error fetching posts' },
             { status: 500 }
         );
     }
@@ -129,24 +140,18 @@ export async function POST(req: Request) {
 
 export async function DELETE(request: Request): Promise<Response> {
     try {
-        const supabase = createClient(supabaseUrl, supabaseKey);
-
-        // Get the session from cookie
         const cookieStore = cookies();
-        const token = cookieStore.get('sb-access-token')?.value;
+        const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
-        if (!token) {
+        // Vérifier la session
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session) {
             return NextResponse.json(
                 { error: 'Not authenticated' }, 
                 { status: 401 }
             );
         }
-
-        // Set the auth token
-        supabase.auth.setSession({
-            access_token: token,
-            refresh_token: '',
-        });
 
         const { postIds } = await request.json();
 
@@ -161,7 +166,7 @@ export async function DELETE(request: Request): Promise<Response> {
             .from('posts')
             .delete()
             .in('id', postIds)
-            .eq('author_id', session.user.id); // Only delete user's own posts
+            .eq('author_id', session.user.id);
 
         if (error) {
             console.error('Database error:', error);

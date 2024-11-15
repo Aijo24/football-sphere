@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { cookies } from 'next/headers';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 
 export async function GET(
     request: Request,
     { params }: { params: { userId: string } }
 ): Promise<Response> {
     try {
+        const cookieStore = cookies();
+        const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+
         console.log('Fetching posts for user ID:', params.userId);
 
         const { data: posts, error } = await supabase
@@ -27,7 +31,15 @@ export async function GET(
             );
         }
 
-        const formattedPosts = posts.map(post => ({
+        const formattedPosts = posts.map((post: {
+            id: string;
+            title: string;
+            content: string;
+            image: string;
+            users: { name: string };
+            created_at: string;
+            author_id: string;
+        }) => ({
             id: post.id,
             title: post.title,
             content: post.content,

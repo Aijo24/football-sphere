@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { supabase } from '@/lib/supabase';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 
 export async function POST(request: Request) {
     try {
+        const cookieStore = cookies();
+        const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+
         const body = await request.json();
         const { username, password } = body;
 

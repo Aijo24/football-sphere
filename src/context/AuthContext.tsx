@@ -12,15 +12,25 @@ interface User {
 
 interface AuthContextType {
     user: User | null;
+    login: (user: User) => void;
     loading: boolean;
     signIn: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
+    logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType>({
+    user: null,
+    login: () => {},
+    loading: true,
+    signIn: async (email: string, password: string) => {},
+    signOut: async () => {},
+    logout: () => {}
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
@@ -30,25 +40,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 if (response.ok) {
                     const userData = await response.json();
                     setUser(userData);
-                } else {
-                    setUser(null);
                 }
             } catch (error) {
                 console.error('Auth check failed:', error);
-                setUser(null);
+            } finally {
+                setLoading(false);
             }
         };
 
         checkAuth();
     }, []);
 
-    const login = (userData: any) => {
-        setUser({
-            id: userData.id,
-            name: userData.name,
-            email: userData.email,
-            role: userData.role
-        });
+    const login = (user: User) => {
+        setUser(user);
     };
 
     const logout = async () => {
@@ -67,8 +71,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const signIn = async (email: string, password: string) => {
+        // Implement your sign in logic here
+    };
+
+    const signOut = async () => {
+        // You can reuse your logout logic here or implement new logic
+        return logout();
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout, loading, signIn, signOut }}>
             {children}
         </AuthContext.Provider>
     );

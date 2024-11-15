@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { cookies } from 'next/headers';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
     try {
+        const cookieStore = cookies();
+        const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+
         const { searchParams } = new URL(request.url);
         const query = searchParams.get('q');
 
@@ -33,7 +37,7 @@ export async function GET(request: Request) {
         }
 
         // Transform the response
-        const formattedPosts = posts.map(post => ({
+        const formattedPosts = posts.map((post: { users: { name: string }, [key: string]: any }) => ({
             ...post,
             author: post.users.name,
             users: undefined

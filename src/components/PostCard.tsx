@@ -27,7 +27,8 @@ export default function PostCard({ id, title, image, author, categories }: PostC
                 onError={() => {
                     const imgElement = document.querySelector(`[data-post-id="${id}"] img`);
                     if (imgElement) {
-                        imgElement.style.display = 'none';
+                        (imgElement as HTMLImageElement).style.display = 'none';
+                        (imgElement as HTMLElement).style.display = 'none';
                     }
                 }}
             />

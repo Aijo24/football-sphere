@@ -8,7 +8,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import Header from '@/components/Header';
 
 export default function CreatePost() {
     const router = useRouter();
@@ -114,7 +113,6 @@ export default function CreatePost() {
 
     return (
         <div className={styles.wrapper}>
-            <Header />
             <div className={styles.container}>
                 <Link href="/" className={styles.backLink}>
                     ← Back to Home

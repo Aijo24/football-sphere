@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { cookies } from 'next/headers';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 
 export async function GET(
     request: Request,
     { params }: { params: { id: string } }
 ): Promise<Response> {
     try {
+        const cookieStore = cookies();
+        const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+
         const postId = params.id;
         console.log('Fetching post:', postId);
 
@@ -61,6 +65,9 @@ export async function DELETE(
     { params }: { params: { id: string } }
 ): Promise<Response> {
     try {
+        const cookieStore = cookies();
+        const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+
         const postId = params.id;
         const body = await request.json();
         const { user_id, role } = body;
@@ -116,6 +123,9 @@ export async function PUT(
     { params }: { params: { id: string } }
 ): Promise<Response> {
     try {
+        const cookieStore = cookies();
+        const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+
         const postId = params.id;
         const { content, author_id } = await request.json();
 
