@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import styles from './login.module.css';
 
 export default function LoginForm() {
     const [username, setUsername] = useState('');
@@ -45,59 +46,51 @@ export default function LoginForm() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Sign in to your account
-                    </h2>
-                </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <div className={styles.wrapper}>
+            <div className={styles.container}>
+                <h2 className={styles.title}>
+                    Connexion à votre compte
+                </h2>
+                <form className={styles.form} onSubmit={handleSubmit}>
                     {error && (
-                        <div className="text-red-500 text-center">
+                        <div className={styles.error}>
                             {error}
                         </div>
                     )}
-                    <div>
-                        <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                            Username
-                        </label>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="username">Nom d'utilisateur</label>
                         <input
                             id="username"
                             name="username"
                             type="text"
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className={styles.input}
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                         />
                     </div>
-                    <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                            Password
-                        </label>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="password">Mot de passe</label>
                         <input
                             id="password"
                             name="password"
                             type="password"
                             required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className={styles.input}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
-                    <div>
-                        <button
-                            type="submit"
-                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            Sign in
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        className={styles.button}
+                    >
+                        Se connecter
+                    </button>
                 </form>
                 <div className="text-center mt-4">
-                    <Link href="/signup" className="text-indigo-600 hover:text-indigo-500">
-                        Don&apos;t have an account? Sign up
+                    <Link href="/signup" className={styles.signupLink}>
+                        Pas encore de compte ? S'inscrire
                     </Link>
                 </div>
             </div>
