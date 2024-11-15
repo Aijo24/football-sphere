@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import styles from './profile.module.css'
 import PostCard from '@/components/PostCard'
+import Header from '@/components/Header'
 
 interface Post {
     id: string;
@@ -48,6 +49,7 @@ export default function ProfilePage() {
 
     return (
         <div className={styles.main}>
+            <Header />
             <div className={styles.container}>
                 <div className={styles.titleContainer}>
                     <h1 className={styles.title}>My Profile</h1>

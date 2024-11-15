@@ -1,193 +1,213 @@
 "use client"
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
-import { useDropzone } from 'react-dropzone';
-import Image from 'next/image';
-import { supabase } from '@/lib/supabase';
+import { toast } from 'react-toastify';
 import styles from './create-post.module.css';
+import { PREDEFINED_CATEGORIES } from '@/types/categories';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import Header from '@/components/Header';
 
 export default function CreatePost() {
     const router = useRouter();
     const { user } = useAuth();
+    const supabase = createClientComponentClient();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string>('');
-    const [error, setError] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [imageBase64, setImageBase64] = useState<string>('');
+    const [previewUrl, setPreviewUrl] = useState<string>('');
 
-    const onDrop = useCallback((acceptedFiles: File[]) => {
-        const file = acceptedFiles[0];
+    useEffect(() => {
+        if (!user) {
+            router.push('/login');
+        }
+    }, [user, router]);
+
+    const convertToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = error => reject(error);
+        });
+    };
+
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
         if (file) {
-            setImageFile(file);
-            // Create preview URL
-            const previewUrl = URL.createObjectURL(file);
-            setImagePreview(previewUrl);
+            // Vérifier la taille du fichier (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error('Image size should be less than 5MB');
+                return;
+            }
+
+            try {
+                const base64String = await convertToBase64(file);
+                setImageBase64(base64String);
+                setPreviewUrl(URL.createObjectURL(file));
+            } catch (error) {
+                console.error('Error converting image:', error);
+                toast.error('Failed to process image');
+            }
         }
-    }, []);
+    };
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
-        accept: {
-            'image/*': ['.jpeg', '.jpg', '.png', '.gif']
-        },
-        maxSize: 5242880, // 5MB
-        multiple: false
-    });
-
-    const uploadImage = async (file: File): Promise<string> => {
-        if (!user?.id) {
-            throw new Error('User not authenticated');
-        }
-
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `${user.id}/${fileName}`;
-
-        try {
-            const { error: uploadError, data } = await supabase.storage
-                .from('post-images')
-                .upload(filePath, file, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
-
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('post-images')
-                .getPublicUrl(filePath);
-
-            return publicUrl;
-        } catch (error) {
-            console.error('Error uploading image:', error);
-            throw new Error('Failed to upload image');
-        }
+    const handleRemoveImage = () => {
+        setImageBase64('');
+        setPreviewUrl('');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!user?.id) {
+            toast.error('You must be logged in to create a post');
+            return;
+        }
         
-        if (!user) {
-            setError('You must be logged in to create a post');
-            return;
-        }
-
-        if (!title.trim() || !content.trim()) {
-            setError('Title and content are required');
-            return;
-        }
-
-        setIsSubmitting(true);
-        setError('');
+        setLoading(true);
 
         try {
-            let imageUrl = '';
-            if (imageFile) {
-                imageUrl = await uploadImage(imageFile);
+            const { data: post, error } = await supabase
+                .from('posts')
+                .insert([
+                    {
+                        title,
+                        content,
+                        image: imageBase64 || null,
+                        author_id: user.id,
+                        categories: selectedCategories
+                    }
+                ])
+                .select()
+                .single();
+
+            if (error) {
+                throw error;
             }
 
-            const response = await fetch('/api/posts', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    title,
-                    content,
-                    image: imageUrl,
-                    author_id: user.id
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to create post');
+            toast.success('Post created successfully!');
+            router.push('/');
+            router.refresh();
+        } catch (error) {
+            console.error('Error details:', error);
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error('An error occurred while creating the post');
             }
-
-            router.push('/profile');
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to create post');
         } finally {
-            setIsSubmitting(false);
+            setLoading(false);
         }
     };
 
-    if (!user) {
-        return (
-            <div className={styles.container}>
-                <p className={styles.error}>Please log in to create a post</p>
-            </div>
+    const handleCategoryChange = (categoryId: string) => {
+        setSelectedCategories(prev => 
+            prev.includes(categoryId)
+                ? prev.filter(id => id !== categoryId)
+                : [...prev, categoryId]
         );
-    }
+    };
 
     return (
-        <div className={styles.main}>
+        <div className={styles.wrapper}>
+            <Header />
             <div className={styles.container}>
-                <div className={styles.titleContainer}>
-                    <h1 className={styles.title}>Create New Post</h1>
-                </div>
-                {error && <p className={styles.error}>{error}</p>}
+                <Link href="/" className={styles.backLink}>
+                    ← Back to Home
+                </Link>
+                <h1 className={styles.title}>Create New Post</h1>
+                
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <div className={styles.formGroup}>
-                        <label htmlFor="title">Title</label>
+                        <label htmlFor="title">Title:</label>
                         <input
                             type="text"
                             id="title"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            disabled={isSubmitting}
+                            required
+                            className={styles.input}
                         />
                     </div>
+
                     <div className={styles.formGroup}>
-                        <label htmlFor="content">Content</label>
+                        <label>Categories:</label>
+                        <div className={styles.categoriesGrid}>
+                            {PREDEFINED_CATEGORIES.map(category => (
+                                <div key={category.id} className={styles.categoryItem}>
+                                    <input
+                                        type="checkbox"
+                                        id={`category-${category.id}`}
+                                        checked={selectedCategories.includes(category.id)}
+                                        onChange={() => handleCategoryChange(category.id)}
+                                        className={styles.categoryCheckbox}
+                                    />
+                                    <label 
+                                        htmlFor={`category-${category.id}`}
+                                        className={styles.categoryLabel}
+                                        title={category.description}
+                                    >
+                                        {category.name}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label htmlFor="imageUpload">Upload Image:</label>
+                        <input
+                            type="file"
+                            id="imageUpload"
+                            onChange={handleImageChange}
+                            accept="image/*"
+                            className={styles.fileInput}
+                        />
+                        <small className={styles.imageHint}>
+                            Maximum file size: 5MB
+                        </small>
+                    </div>
+
+                    {previewUrl && (
+                        <div className={styles.imagePreview}>
+                            <Image
+                                src={previewUrl}
+                                alt="Preview"
+                                width={200}
+                                height={200}
+                                style={{ objectFit: 'cover' }}
+                            />
+                            <button
+                                type="button"
+                                onClick={handleRemoveImage}
+                                className={styles.removeImage}
+                            >
+                                Remove Image
+                            </button>
+                        </div>
+                    )}
+
+                    <div className={styles.formGroup}>
+                        <label htmlFor="content">Content:</label>
                         <textarea
                             id="content"
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
-                            disabled={isSubmitting}
+                            required
+                            className={styles.textarea}
                         />
                     </div>
-                    <div className={styles.formGroup}>
-                        <label>Image</label>
-                        <div
-                            {...getRootProps()}
-                            className={`${styles.dropzone} ${isDragActive ? styles.dragActive : ''}`}
-                        >
-                            <input {...getInputProps()} />
-                            {imagePreview ? (
-                                <div className={styles.imagePreview}>
-                                    <Image
-                                        src={imagePreview}
-                                        alt="Preview"
-                                        width={200}
-                                        height={200}
-                                        objectFit="cover"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setImageFile(null);
-                                            setImagePreview('');
-                                        }}
-                                        className={styles.removeImage}
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
-                            ) : (
-                                <p>Drag & drop an image here, or click to select</p>
-                            )}
-                        </div>
-                    </div>
+
                     <button 
                         type="submit" 
                         className={styles.submitButton}
-                        disabled={isSubmitting}
+                        disabled={loading}
                     >
-                        {isSubmitting ? 'Creating...' : 'Create Post'}
+                        {loading ? 'Creating...' : 'Create Post'}
                     </button>
                 </form>
             </div>

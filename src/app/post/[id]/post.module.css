@@ -62,20 +62,17 @@
 
 .imageContainer {
     width: 100%;
-    height: 200px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 2rem 0;
+    max-height: 400px;
     overflow: hidden;
-    background-color: #f3f4f6;
+    border-radius: 8px;
+    margin-bottom: 1rem;
 }
 
 .image {
-    width: 500px !important;
-    height: 200px !important;
-    object-fit: contain;
-    background-color: #f3f4f6;
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
 }
 
 .content {
@@ -255,4 +252,138 @@
     height: 100%;
     background-color: var(--bg-green);
     z-index: 0;
+}
+
+.categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.category {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.category:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Category-specific colors */
+.category-actualites {
+    background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+}
+
+.category-tactique {
+    background: linear-gradient(135deg, #4ECDC4, #45B7AF);
+}
+
+.category-equipe-de-france {
+    background: linear-gradient(135deg, #2C3E50, #3498DB);
+}
+
+.category-ligue1 {
+    background: linear-gradient(135deg, #F39C12, #F1C40F);
+}
+
+.category-champions-league {
+    background: linear-gradient(135deg, #9B59B6, #8E44AD);
+}
+
+.category-transferts {
+    background: linear-gradient(135deg, #E74C3C, #C0392B);
+}
+
+.category-entrainement {
+    background: linear-gradient(135deg, #27AE60, #2ECC71);
+}
+
+.category-formation {
+    background: linear-gradient(135deg, #16A085, #1ABC9C);
+}
+
+.category-international {
+    background: linear-gradient(135deg, #2980B9, #3498DB);
+}
+
+.category-interviews {
+    background: linear-gradient(135deg, #8E44AD, #9B59B6);
+}
+
+.category-histoire {
+    background: linear-gradient(135deg, #C0392B, #E74C3C);
+}
+
+.category-amateur {
+    background: linear-gradient(135deg, #7F8C8D, #95A5A6);
+}
+
+/* Add hover effects for categories */
+.category-actualites:hover {
+    background: linear-gradient(135deg, #FF8E8E, #FF6B6B);
+}
+
+.category-tactique:hover {
+    background: linear-gradient(135deg, #45B7AF, #4ECDC4);
+}
+
+.category-equipe-de-france:hover {
+    background: linear-gradient(135deg, #3498DB, #2C3E50);
+}
+
+.category-ligue1:hover {
+    background: linear-gradient(135deg, #F1C40F, #F39C12);
+}
+
+.category-champions-league:hover {
+    background: linear-gradient(135deg, #8E44AD, #9B59B6);
+}
+
+.category-transferts:hover {
+    background: linear-gradient(135deg, #C0392B, #E74C3C);
+}
+
+.category-entrainement:hover {
+    background: linear-gradient(135deg, #2ECC71, #27AE60);
+}
+
+.category-formation:hover {
+    background: linear-gradient(135deg, #1ABC9C, #16A085);
+}
+
+.category-international:hover {
+    background: linear-gradient(135deg, #3498DB, #2980B9);
+}
+
+.category-interviews:hover {
+    background: linear-gradient(135deg, #9B59B6, #8E44AD);
+}
+
+.category-histoire:hover {
+    background: linear-gradient(135deg, #E74C3C, #C0392B);
+}
+
+.category-amateur:hover {
+    background: linear-gradient(135deg, #95A5A6, #7F8C8D);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .categories {
+        margin: 1rem 0 2rem;
+    }
+
+    .category {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+    }
 }

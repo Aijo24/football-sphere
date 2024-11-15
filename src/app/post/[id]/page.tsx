@@ -17,6 +17,7 @@ interface Post {
     author: string;
     author_id: string;
     created_at: string;
+    categories: string[];
 }
 
 export default function PostPage() {
@@ -55,13 +56,16 @@ export default function PostPage() {
                 }
 
                 const data = await response.json();
-                console.log('Received post data:', data);
+                console.log('Post data received:', data);
                 
                 if (!data) {
                     throw new Error('No post data received');
                 }
 
-                setPost(data);
+                setPost({
+                    ...data,
+                    categories: data.categories || []
+                });
                 setEditedContent(data.content);
             } catch (err) {
                 console.error('Error fetching post:', err);
@@ -127,6 +131,24 @@ export default function PostPage() {
             toast.error('Failed to delete post');
             console.error('Error deleting post:', err);
         }
+    };
+
+    const renderImage = () => {
+        if (!post?.image) return null;
+
+        // Vérifier si l'image est déjà en base64
+        const isBase64 = post.image.startsWith('data:image');
+        const imageUrl = isBase64 ? post.image : `/api/images/${post.image}`;
+
+        return (
+            <div className={styles.imageContainer}>
+                <img
+                    src={post.image}
+                    alt={post.title}
+                    className={styles.image}
+                />
+            </div>
+        );
     };
 
     if (loading) {
@@ -217,18 +239,7 @@ export default function PostPage() {
                 </header>
 
                 <article className={styles.article}>
-                    {post.image && (
-                        <div className={styles.imageContainer}>
-                            <Image
-                                src={post.image}
-                                alt={post.title}
-                                width={500}
-                                height={200}
-                                className={styles.image}
-                                priority
-                            />
-                        </div>
-                    )}
+                    {renderImage()}
 
                     <div className={styles.content}>
                         <h1 className={styles.title}>{post.title}</h1>
@@ -241,6 +252,19 @@ export default function PostPage() {
                                 <i className="fas fa-calendar" /> {new Date(post.created_at).toLocaleDateString()}
                             </span>
                         </div>
+
+                        {post.categories && post.categories.length > 0 && (
+                            <div className={styles.categories}>
+                                {post.categories.map((category) => (
+                                    <span 
+                                        key={category} 
+                                        className={`${styles.category} ${styles[`category-${category}`]}`}
+                                    >
+                                        {category}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
 
                         {isEditing ? (
                             <div className={styles.editorWrapper}>

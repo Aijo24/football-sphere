@@ -96,7 +96,9 @@ export default function Header() {
                 initial={{opacity:0,x:-1000}} 
                 animate={{opacity:1,x:0}}
             >
-                <h1 className={styles.bookTitle}>Football Sphere</h1>
+                <Link href="/" className={styles.bookTitleLink}>
+                    <h1 className={styles.bookTitle}>Football Sphere</h1>
+                </Link>
                 <div className={styles.searchContainer}>
                     <motion.input 
                         type="text" 
@@ -172,7 +174,7 @@ export default function Header() {
 
                 {user && (
                     <div className={styles.userContainer}>
-                        <span className={styles.userName}>Bienvenu, {user.name}</span>
+                        <span className={styles.userName}>Bienvenue, {user.name}</span>
                         
                         <Link href="/change-password" className={styles.button}>
                             Modifier le mot de passe

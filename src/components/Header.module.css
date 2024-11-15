@@ -165,4 +165,14 @@
         justify-content: center;
         flex-wrap: wrap;
     }
+}
+
+.bookTitleLink {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.bookTitleLink:hover {
+    opacity: 0.9;
 } 

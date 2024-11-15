@@ -1,5 +1,3 @@
-import Image from 'next/image';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 import styles from './PostCard.module.css';
 
@@ -8,36 +6,54 @@ interface PostCardProps {
     title: string;
     image: string | null;
     author: string;
+    categories?: string[];
 }
 
-export default function PostCard({ id, title, image, author }: PostCardProps) {
-    console.log('PostCard props:', { id, title, image, author }); // Debug log
+export default function PostCard({ id, title, image, author, categories }: PostCardProps) {
+    const renderImage = () => {
+        if (!image) {
+            return null;
+        }
 
-    if (!id) {
-        console.error('PostCard received undefined id');
-        return null;
-    }
+        const cleanBase64 = image.replace(/\s+/g, '');
+        const isBase64 = cleanBase64.startsWith('data:');
+        const imageSrc = isBase64 ? cleanBase64 : `/images/${image}`;
+
+        return (
+            <img
+                src={imageSrc}
+                alt={title}
+                className={styles.image}
+                onError={() => {
+                    const imgElement = document.querySelector(`[data-post-id="${id}"] img`);
+                    if (imgElement) {
+                        imgElement.style.display = 'none';
+                    }
+                }}
+            />
+        );
+    };
 
     return (
-        <div className={styles.container}>
-            <Link href={`/post/${id}`} className={styles.link}>
-                <div className={styles['post-image-container']}>
-                    {image && (
-                        <Image
-                            src={image}
-                            alt={title}
-                            width={300}
-                            height={200}
-                            className={styles['post-image']}
-                            priority
-                        />
-                    )}
+        <Link href={`/post/${id}`} className={styles.card}>
+            {image && (
+                <div className={styles.imageWrapper} data-post-id={id}>
+                    {renderImage()}
                 </div>
-                <div className={styles['post-content']}>
-                    <h3 className={styles['post-title']}>{title}</h3>
-                    <p className={styles['post-author']}>By {author}</p>
-                </div>
-            </Link>
-        </div>
+            )}
+            <div className={`${styles.content} ${!image ? styles.noImage : ''}`}>
+                <h2 className={styles.title}>{title}</h2>
+                <p className={styles.author}>by {author}</p>
+                {categories && categories.length > 0 && (
+                    <div className={styles.categories}>
+                        {categories.map((category, index) => (
+                            <span key={index} className={styles.category}>
+                                {category}
+                            </span>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </Link>
     );
 }

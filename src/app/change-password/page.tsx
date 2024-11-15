@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import styles from './change-password.module.css'
+import Link from 'next/link'
 
 interface User {
     id: number;
@@ -89,82 +90,87 @@ export default function ChangePassword() {
     };
 
     return (
-        <div className={styles.container}>
-            <h1 className={styles.title}>Change Password</h1>
-            
-            <form onSubmit={handleSubmit} className={styles.form}>
-                {user?.role === 'ADMIN' && (
-                    <div className={styles.formGroup}>
-                        <label htmlFor="userSelect">Select User:</label>
-                        <select
-                            id="userSelect"
-                            value={userIdToChange}
-                            onChange={(e) => setUserIdToChange(e.target.value)}
-                            className={styles.select}
-                            disabled={loading}
-                            required
-                        >
-                            <option value="">
-                                {loading ? 'Loading users...' : 'Select a user'}
-                            </option>
-                            {users.map(user => (
-                                <option key={user.id} value={user.id}>
-                                    {user.name}
+        <div className={styles.wrapper}>
+            <div className={styles.container}>
+                <Link href="/" className={styles.backLink}>
+                    ← Back to Home
+                </Link>
+                <h1 className={styles.title}>Change Password</h1>
+                
+                <form onSubmit={handleSubmit} className={styles.form}>
+                    {user?.role === 'ADMIN' && (
+                        <div className={styles.formGroup}>
+                            <label htmlFor="userSelect">Select User:</label>
+                            <select
+                                id="userSelect"
+                                value={userIdToChange}
+                                onChange={(e) => setUserIdToChange(e.target.value)}
+                                className={styles.select}
+                                disabled={loading}
+                                required
+                            >
+                                <option value="">
+                                    {loading ? 'Loading users...' : 'Select a user'}
                                 </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
+                                {users.map(user => (
+                                    <option key={user.id} value={user.id}>
+                                        {user.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
 
-                {user?.role !== 'ADMIN' && (
+                    {user?.role !== 'ADMIN' && (
+                        <div className={styles.formGroup}>
+                            <label htmlFor="currentPassword">Current Password:</label>
+                            <input
+                                type="password"
+                                id="currentPassword"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                required
+                                className={styles.input}
+                            />
+                        </div>
+                    )}
+
                     <div className={styles.formGroup}>
-                        <label htmlFor="currentPassword">Current Password:</label>
+                        <label htmlFor="newPassword">New Password:</label>
                         <input
                             type="password"
-                            id="currentPassword"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
+                            id="newPassword"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
                             required
                             className={styles.input}
+                            minLength={6}
                         />
                     </div>
-                )}
 
-                <div className={styles.formGroup}>
-                    <label htmlFor="newPassword">New Password:</label>
-                    <input
-                        type="password"
-                        id="newPassword"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        required
-                        className={styles.input}
-                        minLength={6}
-                    />
-                </div>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="confirmPassword">Confirm New Password:</label>
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                            className={styles.input}
+                            minLength={6}
+                        />
+                    </div>
 
-                <div className={styles.formGroup}>
-                    <label htmlFor="confirmPassword">Confirm New Password:</label>
-                    <input
-                        type="password"
-                        id="confirmPassword"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                        className={styles.input}
-                        minLength={6}
-                    />
-                </div>
-
-                <button 
-                    type="submit" 
-                    className={styles.button}
-                    disabled={loading}
-                >
-                    {loading ? 'Processing...' : 'Change Password'}
-                </button>
-            </form>
-            <ToastContainer />
+                    <button 
+                        type="submit" 
+                        className={styles.button}
+                        disabled={loading}
+                    >
+                        {loading ? 'Processing...' : 'Change Password'}
+                    </button>
+                </form>
+                <ToastContainer />
+            </div>
         </div>
     );
 }

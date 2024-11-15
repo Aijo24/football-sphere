@@ -42,7 +42,8 @@ export async function GET(
             image: post.image,
             author: post.users.name,
             author_id: post.author_id,
-            created_at: post.created_at
+            created_at: post.created_at,
+            categories: post.categories || []
         };
 
         return NextResponse.json(formattedPost);

@@ -1,23 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
+        domains: ['*'],
         remotePatterns: [
             {
-                protocol: 'http',
-                hostname: 'localhost',
-                port: '3000',
-                pathname: '/uploads/**',
+                protocol: 'https',
+                hostname: '**',
             },
         ],
     },
     webpack: (config) => {
         config.module.rules.push({
-            test: /\.(gltf|glb|bin)$/,
-            use: {
-                loader: 'file-loader',
-            },
-        })
-        return config
+            test: /\.(png|jpg|gif|svg|webp)$/i,
+            use: [
+                {
+                    loader: 'url-loader',
+                    options: {
+                        limit: 8192,
+                    },
+                },
+            ],
+        });
+        return config;
     },
 }
 

@@ -1,0 +1,41 @@
+.filterContainer {
+    margin: 2rem 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 15px;
+    border: 2px solid var(--field-green);
+}
+
+.filterTitle {
+    color: var(--primary-green);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.categoriesList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.categoryButton {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--field-green);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.4);
+    color: var(--primary-green);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.categoryButton:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.categoryButton.selected {
+    background: var(--primary-green);
+    color: var(--accent-white);
+} 
